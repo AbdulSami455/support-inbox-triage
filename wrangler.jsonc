@@ -1,0 +1,27 @@
+{
+  // Cloudflare deployment (works on the free plan): Python Worker + D1 + static assets.
+  // Secrets (SESSION_SECRET, WEBHOOK_SECRET, DEMO_PASSWORD, OPENROUTER_API_KEY) are set
+  // with `npx wrangler secret put <NAME>`, never in this file.
+  "name": "support-inbox-triage",
+  "main": "src/worker.py",
+  "compatibility_date": "2026-11-09",
+  "compatibility_flags": ["python_workers"],
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "src/app/static",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/healthz"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "support-inbox-triage",
+      "database_id": "401b1e1b-bcef-4809-b98b-d39aa3f6f40a"
+    }
+  ],
+  "vars": {
+    "OPENROUTER_MODEL": "nvidia/nemotron-3.5-super-vl:free",
+    "COOKIE_SECURE": "true",
+    "PBKDF2_ITERATIONS": "10000"
+  }
+}
