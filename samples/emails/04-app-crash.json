@@ -1,0 +1,1 @@
+{"message_id": "<sample-004@mail.example.com>", "from": "dev-team@startup.example", "subject": "App crashes when exporting reports", "text": "Since yesterday's update the app crashes every time we click Export on the reports page. Chrome 131 on macOS. Our whole team is affected."}
