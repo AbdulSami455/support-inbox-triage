@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support Inbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Auros design tokens: teal depth stack, no shadows, medium-weight type, rationed accents */
+  :root {
+    --abyss:#012624; --deep:#011d1c; --kelp:#003734; --slate:#707777;
+    --mist:#edfffe; --white:#ffffff; --silver:#bbc7c6; --phosphor:#fde9ff;
+    --line:rgba(255,255,255,0.1); --arrow-fill:rgba(3,81,75,0.5);
+    --bio:linear-gradient(90deg, rgb(0,130,124) 0%, rgb(203,255,252) 100%);
+    --aurora:linear-gradient(90deg, rgb(203,255,252) 0%, rgb(237,255,254) 26.25%, rgb(255,253,250) 47.57%, rgb(250,209,255) 88.96%);
+    --font:'Matter', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; font:400 16px/1.4 var(--font); background:var(--abyss); color:var(--silver); -webkit-font-smoothing:antialiased; min-height:100vh; }
+  h1, h2, h3, h4 { font-weight:500; color:var(--white); line-height:1; margin:0; }
+  h2 { font-size:36px; letter-spacing:-0.02em; }
+  h3 { font-size:24px; letter-spacing:-0.02em; line-height:1.3; }
+  .display { font-size:clamp(2.5rem, 6vw, 3.8rem); letter-spacing:-0.04em; }
+  .eyebrow { font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.12em; color:var(--silver); }
+  .muted { color:var(--silver); font-size:14px; }
+  .mist { color:var(--mist); }
+  .grow { flex:1; }
+  .hidden { display:none !important; }
+  .row { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+
+  /* ---------- header ---------- */
+  header { display:flex; align-items:center; justify-content:space-between; height:80px; padding:0 40px; max-width:1440px; margin:0 auto; }
+  .brand { display:flex; align-items:center; gap:12px; font-size:12px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--white); cursor:pointer; }
+  .brand-orb { width:22px; height:22px; border-radius:50%; background:radial-gradient(circle at 35% 35%, var(--mist), #00827c 55%, var(--kelp) 100%); }
+  .live { display:inline-flex; align-items:center; gap:8px; font-size:10px; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; color:var(--mist); padding:6px 10px; border:1px solid var(--line); border-radius:6px; }
+  .live i { width:7px; height:7px; border-radius:50%; background:#7ff5ec; animation:pulse 2s infinite; }
+  .chip { display:inline-flex; align-items:center; gap:10px; color:var(--mist); font-size:14px; }
+  .avatar { width:32px; height:32px; border-radius:6px; background:var(--kelp); color:var(--white); display:grid; place-items:center; font-weight:500; font-size:14px; }
+  main { max-width:1200px; margin:0 auto 68px; padding:0 40px; }
+
+  /* ---------- motion ---------- */
+  @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+  @keyframes fade { from { opacity:0; } to { opacity:1; } }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+  @keyframes shimmer { from { background-position:-400px 0; } to { background-position:400px 0; } }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @keyframes breathe { 0%,100% { transform:scale(.92); opacity:.8; } 50% { transform:scale(1.05); opacity:1; } }
+  @keyframes flash { from { background:rgba(127,245,236,.14); } to { background:transparent; } }
+  .view { animation:rise .45s var(--ease) both; }
+  .view > * { animation:rise .5s var(--ease) both; }
+  .view > *:nth-child(2) { animation-delay:.05s; } .view > *:nth-child(3) { animation-delay:.1s; } .view > *:nth-child(4) { animation-delay:.15s; }
+  .still, .still > * { animation:none !important; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation:none !important; transition:none !important; } }
+
+  /* ---------- splash ---------- */
+  .splash { min-height:70vh; display:grid; place-items:center; align-content:center; gap:24px; animation:fade .3s both; }
+  .orb { width:88px; height:88px; border-radius:50%; background:radial-gradient(circle at 35% 35%, var(--mist) 0%, #7ff5ec 18%, #00827c 50%, var(--kelp) 80%); animation:breathe 2.2s var(--ease) infinite; }
+
+  /* ---------- surfaces ---------- */
+  .card { background:var(--kelp); border-radius:16px; padding:36px; margin-bottom:20px; }
+  .card.recessed { background:var(--deep); }
+  .card.tight { padding:24px; }
+
+  /* ---------- controls ---------- */
+  button { font:400 14px/1.43 Arial, system-ui, sans-serif; padding:10px 16px; border:none; background:var(--arrow-fill); color:var(--white); border-radius:6px; cursor:pointer; transition:background .2s, opacity .2s, transform .1s; display:inline-flex; align-items:center; gap:8px; }
+  button:hover:not(:disabled) { background:var(--kelp); }
+  button:active:not(:disabled) { transform:translateY(1px); }
+  button.primary { background:var(--aurora); color:#222222; text-transform:uppercase; letter-spacing:0.08em; padding:14px 22px; }
+  button.primary:hover:not(:disabled) { background:var(--aurora); filter:brightness(1.05); }
+  button.ghost { background:transparent; border:1px solid var(--line); }
+  button.link { background:none; padding:0; font:400 12px/1 var(--font); text-transform:uppercase; letter-spacing:0.12em; color:var(--silver); }
+  button.link.active, button.link:hover:not(:disabled) { color:var(--white); background:none; }
+  button:disabled { opacity:.45; cursor:default; }
+  button.loading { pointer-events:none; }
+  button.loading::before { content:''; width:14px; height:14px; border-radius:50%; border:2px solid currentColor; border-right-color:transparent; animation:spin .7s linear infinite; }
+  .count { font-size:10px; padding:1px 6px; border-radius:6px; background:var(--abyss); color:var(--mist); margin-left:6px; }
+  input, textarea, select { font:400 16px/1.4 var(--font); padding:12px 14px; border:1px solid var(--line); border-radius:6px; width:100%; background:var(--deep); color:var(--mist); transition:border-color .2s; }
+  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--silver); }
+  select option { background:var(--deep); }
+  textarea { min-height:220px; resize:vertical; }
+  label { display:block; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.15em; color:var(--silver); margin:20px 0 8px; }
+  .segmented { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:4px; background:var(--deep); border-radius:6px; }
+  .segmented button { justify-content:center; background:transparent; color:var(--silver); text-transform:uppercase; letter-spacing:0.12em; font-size:12px; }
+  .segmented button.on { background:var(--kelp); color:var(--white); }
+  .pw { position:relative; } .pw button { position:absolute; right:6px; top:6px; padding:6px 10px; font-size:12px; }
+
+  /* ---------- badges ---------- */
+  .badge { display:inline-block; padding:3px 10px; border-radius:6px; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.12em; background:var(--abyss); color:var(--mist); border:1px solid var(--line); white-space:nowrap; }
+  .badge.open { background:var(--mist); color:var(--abyss); border-color:transparent; }
+  .badge.closed { color:var(--slate); }
+  .badge.high, .badge.overdue { background:var(--phosphor); color:var(--abyss); border-color:transparent; }
+  .badge.low { color:var(--silver); }
+  .badge.ok { color:#7ff5ec; }
+
+  /* ---------- list ---------- */
+  .hero { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; margin:40px 0 48px; flex-wrap:wrap; }
+  .stats { display:flex; gap:48px; }
+  .stat { font-size:61px; font-weight:500; line-height:1; letter-spacing:-0.04em; color:var(--phosphor); }
+  .stat-label { font-size:13px; text-transform:uppercase; letter-spacing:0.055em; color:var(--mist); margin-top:8px; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; padding:16px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.15em; color:var(--silver); }
+  td { color:var(--silver); }
+  td .subject { color:var(--white); font-weight:500; }
+  tr.click td { transition:background .2s; }
+  tr.click:hover td { background:rgba(1,38,36,0.6); cursor:pointer; }
+  tr.fresh td { animation:flash 3s ease-out; }
+  .tags { display:flex; gap:6px; flex-wrap:wrap; }
+
+  /* ---------- skeletons ---------- */
+  .sk { border-radius:6px; background:linear-gradient(90deg, rgba(255,255,255,.04) 0, rgba(255,255,255,.10) 40px, rgba(255,255,255,.04) 80px) var(--deep); background-size:800px 100%; animation:shimmer 1.4s linear infinite; }
+  .sk.line { height:14px; margin:10px 0; } .sk.big { height:56px; width:220px; } .sk.block { height:120px; }
+
+  /* ---------- ticket ---------- */
+  .grid { display:grid; grid-template-columns:2fr 1fr; gap:20px; align-items:start; }
+  .email { white-space:pre-wrap; background:var(--deep); border-radius:6px; padding:20px; color:var(--mist); }
+  .meta { color:var(--silver); font-size:14px; }
+  .tiles { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:8px; }
+  .tile { background:var(--deep); border-radius:6px; padding:16px; }
+  .tile .v { color:var(--white); font-size:20px; font-weight:500; margin-top:8px; text-transform:capitalize; }
+  .meter { display:flex; gap:4px; margin-top:10px; } .meter i { flex:1; height:4px; border-radius:2px; background:var(--abyss); }
+  .meter i.on { background:var(--bio); } .meter.high i.on { background:var(--phosphor); }
+  .spinner { width:16px; height:16px; border-radius:50%; border:2px solid #7ff5ec; border-right-color:transparent; animation:spin .8s linear infinite; }
+  .editor-bar { display:flex; align-items:center; gap:12px; margin:24px 0 8px; flex-wrap:wrap; }
+  .editor-bar label { margin:0; }
+  .hint { font-size:12px; color:var(--slate); }
+  kbd { font:inherit; font-size:11px; padding:1px 6px; border:1px solid var(--line); border-radius:4px; color:var(--silver); }
+  .error { color:var(--abyss); background:var(--phosphor); padding:14px 16px; border-radius:6px; font-size:14px; }
+  .timeline { position:relative; padding-left:24px; }
+  .timeline::before { content:''; position:absolute; left:5px; top:6px; bottom:6px; width:1px; background:var(--line); }
+  .timeline .item { position:relative; margin-bottom:24px; }
+  .timeline .item::before { content:''; position:absolute; left:-24px; top:4px; width:11px; height:11px; border-radius:50%; background:var(--bio); }
+  .facts { display:grid; grid-template-columns:auto 1fr; gap:10px 16px; font-size:14px; } .facts dt { color:var(--slate); } .facts dd { margin:0; color:var(--mist); word-break:break-word; }
+
+  /* ---------- login ---------- */
+  .login { display:grid; grid-template-columns:1.1fr 1fr; gap:64px; align-items:center; min-height:calc(100vh - 160px); }
+
+  /* ---------- toasts & modal ---------- */
+  #toasts { position:fixed; right:24px; bottom:24px; display:grid; gap:10px; z-index:50; width:min(360px, calc(100vw - 32px)); }
+  .toast { background:var(--kelp); border:1px solid var(--line); border-radius:6px; padding:14px 16px; color:var(--mist); font-size:14px; animation:rise .35s var(--ease) both; display:flex; gap:12px; align-items:flex-start; }
+  .toast.error { background:var(--phosphor); color:var(--abyss); }
+  .toast .t-sub { color:var(--silver); font-size:13px; margin-top:2px; }
+  .toast.error .t-sub { color:var(--abyss); }
+  .toast button { padding:6px 10px; font-size:12px; margin-left:auto; }
+  .toast.out { opacity:0; transform:translateY(6px); transition:all .25s; }
+  .overlay { position:fixed; inset:0; background:rgba(1,29,28,.82); display:grid; place-items:center; z-index:40; animation:fade .2s both; padding:16px; }
+  .modal { background:var(--kelp); border-radius:16px; padding:36px; width:min(560px, 100%); animation:rise .3s var(--ease) both; }
+  .modal .email { max-height:240px; overflow:auto; margin:16px 0 24px; }
+
+  @media (max-width:900px) { .login { grid-template-columns:1fr; gap:24px; } .pitch { display:none; } }
+  @media (max-width:800px) {
+    .grid { grid-template-columns:1fr; } header, main { padding:0 16px; } .card { padding:24px; }
+    .stats { gap:24px; } .stat { font-size:44px; }
+    th:nth-child(5), td:nth-child(5), th:nth-child(6), td:nth-child(6) { display:none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand" id="brand"><span class="brand-orb"></span>Support Inbox</div>
+  <div id="who" class="row"></div>
+</header>
+<main id="app"><div class="splash"><div class="orb"></div><div class="eyebrow">Loading inbox</div></div></main>
+<div id="toasts"></div>
+
+<script>
+const $app = document.getElementById('app');
+let me = null, users = [];
+const state = { view: null, status: 'all', page: 1, ticketId: null, lastSeenId: 0, fresh: new Set(), formOpen: false };
+const AGENTS = [['sam@support.test', 'Sam'], ['jordan@support.test', 'Jordan'], ['riley@support.test', 'Riley']];
+const FILTERS = ['all', 'open', 'overdue', 'replied', 'closed'];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// Tiny DOM helper. Text is always set via textContent (no HTML injection from emails).
+function h(tag, attrs = {}, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const k of kids.flat()) if (k != null && k !== false) el.append(k instanceof Node ? k : document.createTextNode(String(k)));
+  return el;
+}
+const fmt = ts => new Date(ts * 1000).toLocaleString();
+function ago(ts) {
+  const s = Math.max(0, Date.now() / 1000 - ts);
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+const badge = (txt, cls = '') => h('span', { class: `badge ${cls}` }, txt);
+const initials = name => name.replace(/\(.*\)/, '').trim().slice(0, 1).toUpperCase();
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts,
+    body: opts.body ? JSON.stringify(opts.body) : undefined });
+  if (res.status === 401 && path !== '/api/login' && me) { me = null; renderLogin('Your session ended. Please sign in again.'); throw new Error('Signed out'); }
+  const data = res.status === 204 ? null : await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.detail?.[0]?.msg || data?.detail || `Request failed (${res.status})`);
+  return data;
+}
+
+// Swap the page content with an entrance animation (or silently for live refreshes).
+function show(node, { animate = true } = {}) {
+  node.classList.add(animate ? 'view' : 'still');
+  $app.replaceChildren(node);
+  if (animate) window.scrollTo({ top: 0 });
+}
+
+async function busy(btn, fn) {
+  btn.classList.add('loading'); btn.disabled = true;
+  try { return await fn(); } finally { btn.classList.remove('loading'); btn.disabled = false; }
+}
+
+function toast(title, { sub = '', kind = 'info', action = null, ms = 5000 } = {}) {
+  const el = h('div', { class: `toast ${kind}` },
+    h('div', {}, h('div', {}, title), sub ? h('div', { class: 't-sub' }, sub) : null),
+    action ? h('button', { onclick: () => { action[1](); el.remove(); } }, action[0]) : null);
+  document.getElementById('toasts').append(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }, ms);
+}
+
+function confirmModal({ title, body, preview, okLabel }) {
+  return new Promise(resolve => {
+    const close = v => { overlay.remove(); document.removeEventListener('keydown', onKey); resolve(v); };
+    const onKey = e => { if (e.key === 'Escape') close(false); };
+    const ok = h('button', { class: 'primary', onclick: () => close(true) }, okLabel);
+    const overlay = h('div', { class: 'overlay', onclick: e => { if (e.target === overlay) close(false); } },
+      h('div', { class: 'modal' }, h('h3', { style: 'margin:0 0 8px' }, title),
+        h('div', { class: 'muted' }, body), preview ? h('div', { class: 'email' }, preview) : null,
+        h('div', { class: 'row' }, ok, h('button', { class: 'ghost', onclick: () => close(false) }, 'Cancel'))));
+    document.addEventListener('keydown', onKey);
+    document.body.append(overlay);
+    ok.focus();
+  });
+}
+
+// ---------------- header & live updates ----------------
+function renderHeader() {
+  const who = document.getElementById('who');
+  who.replaceChildren(...(me ? [
+    h('span', { class: 'live', title: 'New tickets appear automatically' }, h('i'), 'Live'),
+    h('span', { class: 'chip' }, h('span', { class: 'avatar' }, initials(me.name)), h('span', {}, me.name.replace(/\s*\(.*\)/, '')), badge(me.role)),
+    h('button', { class: 'ghost', onclick: async e => { await busy(e.currentTarget, () => api('/api/logout', { method: 'POST' })); me = null; renderLogin(); } }, 'Sign out'),
+  ] : []));
+}
+document.getElementById('brand').onclick = () => me && renderList();
+
+let liveTimer = null;
+function startLive() { stopLive(); liveTimer = setInterval(checkUpdates, 10000); }
+function stopLive() { clearInterval(liveTimer); liveTimer = null; }
+async function checkUpdates() {
+  if (!me || document.hidden) return;
+  try {
+    const u = await api(`/api/updates?after_id=${state.lastSeenId}`);
+    if (state.lastSeenId && u.new.length) {
+      u.new.slice(0, 3).reverse().forEach(t => {
+        state.fresh.add(t.id);
+        toast(`New ticket from ${t.from_name || t.from_email}`, { sub: t.subject, action: ['Open', () => renderTicket(t.id)], ms: 8000 });
+      });
+      if (state.view === 'list' && !state.formOpen) renderList({ silent: true });
+    }
+    state.lastSeenId = u.latest_id;
+  } catch (_) { /* network blip: try again on the next tick */ }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUpdates(); });
+
+// ---------------- login ----------------
+function renderLogin(msg = '') {
+  stopLive(); state.view = 'login'; renderHeader();
+  let role = 'agent';
+  const agentSel = h('select', {}, ...AGENTS.map(([e, n]) => h('option', { value: e }, `${n} · ${e}`)));
+  const adminEmail = h('input', { type: 'email', value: 'admin@support.test', autocomplete: 'username' });
+  const emailBox = h('div');
+  const pw = h('input', { type: 'password', autocomplete: 'current-password', placeholder: 'Password' });
+  const eye = h('button', { type: 'button', class: 'ghost', onclick: () => { pw.type = pw.type === 'password' ? 'text' : 'password'; eye.textContent = pw.type === 'password' ? 'Show' : 'Hide'; } }, 'Show');
+  const err = h('div', { class: msg ? 'error' : 'hidden', style: 'margin-top:20px' }, msg);
+  const submit = h('button', { class: 'primary', type: 'submit', style: 'width:100%;justify-content:center' }, 'Sign in as agent');
+  const tabs = ['agent', 'admin'].map(r => h('button', { type: 'button', onclick: () => { role = r; paint(); } }, r));
+  function paint() {
+    tabs.forEach(t => t.classList.toggle('on', t.textContent === role));
+    emailBox.replaceChildren(h('label', {}, role === 'agent' ? 'Agent' : 'Admin email'), role === 'agent' ? agentSel : adminEmail);
+    submit.textContent = `Sign in as ${role}`;
+    err.className = 'hidden';
+  }
+  paint();
+  const form = h('form', { class: 'card', onsubmit: async e => {
+      e.preventDefault(); err.className = 'hidden';
+      const email = role === 'agent' ? agentSel.value : adminEmail.value;
+      try {
+        me = await busy(submit, () => api('/api/login', { method: 'POST', body: { email, password: pw.value, role } }));
+        toast(`Welcome back, ${me.name.replace(/\s*\(.*\)/, '')}`);
+        boot();
+      } catch (ex) { err.className = 'error'; err.textContent = ex.message; pw.select(); }
+    } },
+    h('div', { class: 'eyebrow' }, 'Sign in'), h('h2', { style: 'margin:16px 0 24px' }, 'Welcome back'),
+    h('div', { class: 'segmented' }, ...tabs), emailBox,
+    h('label', {}, 'Password'), h('div', { class: 'pw' }, pw, eye),
+    err, h('div', { style: 'margin-top:28px' }, submit));
+  show(h('div', { class: 'login' },
+    h('div', { class: 'pitch' }, h('div', { class: 'eyebrow' }, 'Support inbox'),
+      h('h1', { class: 'display', style: 'margin-top:20px' }, 'Reply faster. Reply safer.')),
+    form));
+  setTimeout(() => pw.focus(), 50);
+}
+
+// ---------------- ticket list ----------------
+function listSkeleton() {
+  const rows = Array.from({ length: 6 }, () => h('tr', {}, ...[40, 260, 60, 110, 90, 100].map(w => h('td', {}, h('div', { class: 'sk line', style: `width:${w}px` })))));
+  return h('div', {},
+    h('section', { class: 'hero' }, h('div', {}, h('div', { class: 'eyebrow' }, 'Shared inbox'), h('h2', { class: 'display', style: 'margin-top:16px' }, 'Tickets')),
+      h('div', { class: 'stats' }, h('div', { class: 'sk big' }), h('div', { class: 'sk big' }))),
+    h('div', { class: 'card' }, h('table', {}, h('tbody', {}, rows))));
+}
+
+async function renderList({ silent = false } = {}) {
+  state.view = 'list'; state.ticketId = null;
+  if (location.hash) history.replaceState(null, '', location.pathname);
+  if (!silent) { state.formOpen = false; show(listSkeleton()); }
+  let data;
+  try { data = await api(`/api/tickets?status=${state.status}&page=${state.page}`); }
+  catch (ex) { if (me) toast(ex.message, { kind: 'error' }); return; }
+  if (state.view !== 'list') return; // user navigated away meanwhile
+  const pages = Math.max(1, Math.ceil(data.total / data.page_size));
+  const go = (s, p) => { state.status = s; state.page = p; renderList(); };
+  const filters = FILTERS.map(s => h('button', { class: s === state.status ? 'link active' : 'link', onclick: () => go(s, 1) },
+    s, s === 'overdue' && data.overdue_total ? h('span', { class: 'count' }, data.overdue_total) : null));
+  const rows = data.items.map(t => h('tr', { class: `click${state.fresh.has(t.id) ? ' fresh' : ''}`, onclick: () => renderTicket(t.id) },
+    h('td', { class: 'mist' }, `#${t.id}`),
+    h('td', {}, h('div', { class: 'subject' }, t.subject), h('div', { class: 'muted' }, t.from_name ? `${t.from_name} <${t.from_email}>` : t.from_email)),
+    h('td', {}, h('div', { class: 'tags' }, badge(t.status, t.status), t.overdue ? badge('Overdue', 'overdue') : null)),
+    h('td', {}, t.category ? h('div', { class: 'tags' }, badge(t.category.replace('_', ' ')), badge(t.urgency, t.urgency)) : h('span', { class: 'muted' }, 'Not triaged')),
+    h('td', {}, t.assignee_name || h('span', { class: 'muted' }, 'Unassigned')),
+    h('td', { class: 'muted', title: fmt(t.created_at) }, ago(t.created_at), h('div', { class: 'hint' }, `via ${t.source}`))));
+  setTimeout(() => state.fresh.clear(), 3000);
+
+  const form = newTicketForm();
+  show(h('div', {},
+    h('section', { class: 'hero' },
+      h('div', {}, h('div', { class: 'eyebrow' }, 'Shared inbox'), h('h2', { class: 'display', style: 'margin-top:16px' }, 'Tickets')),
+      h('div', { class: 'stats' },
+        h('div', {}, h('div', { class: 'stat' }, String(data.total)), h('div', { class: 'stat-label' }, `${state.status} tickets`)),
+        h('div', {}, h('div', { class: 'stat' }, String(data.overdue_total)), h('div', { class: 'stat-label' }, 'Overdue > 24h')))),
+    form,
+    h('div', { class: 'card' },
+      h('div', { class: 'row', style: 'margin-bottom:12px' }, ...filters, h('span', { class: 'grow' }), h('span', { class: 'muted' }, `Page ${data.page} of ${pages}`)),
+      h('table', {}, h('thead', {}, h('tr', {}, ...['#', 'Subject / from', 'Status', 'Triage', 'Assignee', 'Received'].map(c => h('th', {}, c)))),
+        h('tbody', {}, rows.length ? rows : h('tr', {}, h('td', { colspan: 6, class: 'muted', style: 'padding:40px 12px;text-align:center' },
+          'No tickets.')))),
+      h('div', { class: 'row', style: 'margin-top:20px' },
+        h('button', { disabled: state.page <= 1, onclick: () => go(state.status, state.page - 1) }, '← Prev'),
+        h('span', { class: 'muted' }, `${data.page} / ${pages}`),
+        h('button', { disabled: state.page >= pages, onclick: () => go(state.status, state.page + 1) }, 'Next →')))),
+    { animate: !silent });
+}
+
+function newTicketForm() {
+  const from = h('input', { placeholder: 'Customer <customer@example.com>' });
+  const subject = h('input', { placeholder: 'Subject' });
+  const body = h('textarea', { placeholder: 'Message', style: 'min-height:100px' });
+  const err = h('div', { class: 'hidden', style: 'margin-top:16px' });
+  const submit = h('button', { class: 'primary', type: 'submit' }, 'Create ticket');
+  const box = h('form', { class: 'card recessed hidden', onsubmit: async e => {
+      e.preventDefault(); err.className = 'hidden';
+      try {
+        const r = await busy(submit, () => api('/api/tickets', { method: 'POST', body: { from: from.value, subject: subject.value, body: body.value } }));
+        state.formOpen = false; toast('Ticket created', { sub: subject.value }); renderTicket(r.id);
+      } catch (ex) { err.className = 'error'; err.textContent = ex.message; }
+    } },
+    h('h3', {}, 'New ticket'),
+    h('label', {}, 'From'), from, h('label', {}, 'Subject'), subject, h('label', {}, 'Message'), body, err,
+    h('div', { class: 'row', style: 'margin-top:24px' }, submit, h('button', { type: 'button', class: 'ghost', onclick: () => toggle() }, 'Cancel')));
+  const toggle = () => { box.classList.toggle('hidden'); state.formOpen = !box.classList.contains('hidden'); if (state.formOpen) { box.classList.add('view'); from.focus(); } };
+  return h('div', {}, h('div', { class: 'row', style: 'margin-bottom:20px' }, h('button', { onclick: toggle }, '+ New ticket')), box);
+}
+
+// ---------------- ticket detail ----------------
+function ticketSkeleton() {
+  return h('div', {}, h('div', { class: 'row', style: 'margin:24px 0' }, h('div', { class: 'sk line', style: 'width:140px' })),
+    h('div', { class: 'grid' },
+      h('div', {}, h('div', { class: 'card' }, h('div', { class: 'sk line', style: 'width:120px' }), h('div', { class: 'sk line', style: 'height:36px;width:70%;margin:20px 0' }), h('div', { class: 'sk block' })),
+        h('div', { class: 'card' }, h('div', { class: 'sk line', style: 'width:160px' }), h('div', { class: 'sk block', style: 'margin-top:20px' }))),
+      h('div', {}, h('div', { class: 'card' }, h('div', { class: 'sk line' }), h('div', { class: 'sk line' }), h('div', { class: 'sk line' })))));
+}
+
+async function renderTicket(id) {
+  state.view = 'ticket'; state.ticketId = id;
+  if (location.hash !== `#ticket-${id}`) history.pushState(null, '', `#ticket-${id}`);
+  show(ticketSkeleton());
+  let t;
+  try { t = await api(`/api/tickets/${id}`); }
+  catch (ex) { toast(ex.message, { kind: 'error' }); return renderList(); }
+  if (state.ticketId !== id) return;
+  const side = h('div', {});
+  const triageBox = h('div', { class: 'card' });
+  show(h('div', {},
+    h('div', { class: 'row', style: 'margin:24px 0' }, h('button', { class: 'link', onclick: () => renderList() }, '← Back to tickets')),
+    h('div', { class: 'grid' },
+      h('div', {},
+        h('div', { class: 'card' },
+          h('div', { class: 'row', style: 'gap:8px' }, h('span', { class: 'eyebrow' }, `Ticket #${t.id}`), badge(t.status, t.status), t.overdue ? badge('Overdue', 'overdue') : null),
+          h('h2', { style: 'margin:16px 0 12px' }, t.subject),
+          h('div', { class: 'meta' }, `${t.from_name ? t.from_name + ' ' : ''}<${t.from_email}> · ${fmt(t.created_at)} · via ${t.source}`),
+          h('div', { class: 'email', style: 'margin-top:20px' }, t.body)),
+        triageBox,
+        h('div', { class: 'card recessed' }, h('h3', { style: 'margin:0 0 24px' }, 'Sent replies'),
+          t.replies.length ? h('div', { class: 'timeline' }, t.replies.map(r => h('div', { class: 'item' },
+            h('div', { class: 'eyebrow', style: 'margin-bottom:8px' }, `Sent by ${r.sent_by} · ${fmt(r.sent_at)}`), h('div', { class: 'email' }, r.body))))
+            : h('div', { class: 'muted' }, 'No replies yet.'))),
+      side)));
+  renderSide(side, t);
+  renderTriage(triageBox, side, t);
+}
+
+function renderSide(el, t) {
+  const status = h('select', { onchange: async () => {
+      try { await api(`/api/tickets/${t.id}/status`, { method: 'PATCH', body: { status: status.value } }); toast(`Status set to ${status.value}`); renderTicket(t.id); }
+      catch (ex) { toast(ex.message, { kind: 'error' }); } } },
+    ...['open', 'replied', 'closed'].map(s => h('option', { value: s, selected: s === t.status }, s)));
+  let assign;
+  if (me.role === 'admin') {
+    assign = h('select', { onchange: async () => {
+        try {
+          await api(`/api/tickets/${t.id}/assign`, { method: 'PATCH', body: { assignee_id: assign.value ? Number(assign.value) : null } });
+          toast(assign.value ? `Assigned to ${assign.selectedOptions[0].textContent}` : 'Unassigned'); renderTicket(t.id);
+        } catch (ex) { toast(ex.message, { kind: 'error' }); } } },
+      h('option', { value: '' }, 'Unassigned'),
+      ...users.map(u => h('option', { value: u.id, selected: u.id === t.assignee_id }, u.name)));
+  } else {
+    assign = h('div', { class: 'mist' }, t.assignee_name || 'Unassigned');
+  }
+  el.replaceChildren(h('div', { class: 'card tight' },
+    h('div', { class: 'eyebrow' }, 'Ticket'), h('label', {}, 'Status'), status, h('label', {}, 'Assignee'), assign,
+    h('dl', { class: 'facts', style: 'margin:24px 0 0' }, h('dt', {}, 'Received'), h('dd', {}, ago(t.created_at)),
+      h('dt', {}, 'Source'), h('dd', {}, t.source), h('dt', {}, 'Replies'), h('dd', {}, String(t.replies.length)))));
+}
+
+function urgencyMeter(u) {
+  const n = { low: 1, medium: 2, high: 3 }[u] || 0;
+  return h('div', { class: `meter ${u}` }, [1, 2, 3].map(i => h('i', { class: i <= n ? 'on' : '' })));
+}
+
+function draftLoading(label) {
+  return h('div', { class: 'view' }, h('div', { class: 'row', style: 'gap:10px;margin-bottom:16px' }, h('span', { class: 'spinner' }), h('span', { class: 'mist' }, label)),
+    h('div', { class: 'sk line', style: 'width:90%' }), h('div', { class: 'sk line', style: 'width:75%' }), h('div', { class: 'sk line', style: 'width:82%' }));
+}
+
+async function renderTriage(box, side, t) {
+  box.replaceChildren(h('h3', { style: 'margin:0 0 24px' }, 'AI draft'));
+  if (!t.triage && !t.triage_error) {
+    box.append(draftLoading('Drafting reply…'));
+    try {
+      const res = await api(`/api/tickets/${t.id}/triage`, { method: 'POST' });
+      t.triage = res.triage; t.triage_attempts_left = res.attempts_left;
+    } catch (ex) {
+      t.triage_error = ex.message;
+      t.triage_attempts_left = (await api(`/api/tickets/${t.id}`)).triage_attempts_left;
+    }
+    if (state.ticketId !== t.id) return;
+  }
+  paintTriage(box, side, t);
+}
+
+function paintTriage(box, side, t) {
+  const tri = t.triage;
+  const original = tri?.draft_reply || '';
+  const text = h('textarea', { placeholder: 'Write your reply…' });
+  text.value = original;
+
+  const regen = h('button', { class: 'ghost', disabled: t.triage_attempts_left <= 0,
+      title: t.triage_attempts_left > 0 ? `${t.triage_attempts_left} left for this ticket` : 'Limit reached for this ticket',
+      onclick: async () => {
+        if (tri && text.value !== original && !(await confirmModal({ title: 'Replace your edits?', body: 'Your changes to this draft will be lost.', okLabel: 'Regenerate' }))) return;
+        await busy(regen, async () => {
+          try {
+            const res = await api(`/api/tickets/${t.id}/triage${tri ? '?regenerate=true' : ''}`, { method: 'POST' });
+            t.triage = res.triage; t.triage_error = ''; t.triage_attempts_left = res.attempts_left;
+            toast('New draft ready');
+          } catch (ex) {
+            toast(ex.message, { kind: 'error' });
+            t.triage_attempts_left = (await api(`/api/tickets/${t.id}`)).triage_attempts_left;
+            if (!tri) t.triage_error = ex.message;
+          }
+        });
+        paintTriage(box, side, t);
+      } }, tri ? '↻ Regenerate' : '↻ Try again');
+
+  box.replaceChildren(h('div', { class: 'row', style: 'justify-content:space-between;margin-bottom:24px' }, h('h3', {}, 'AI draft'), regen));
+  if (tri) {
+    box.append(h('div', { class: 'tiles view' },
+      h('div', { class: 'tile' }, h('div', { class: 'eyebrow' }, 'Category'), h('div', { class: 'v' }, tri.category.replace('_', ' '))),
+      h('div', { class: 'tile' }, h('div', { class: 'eyebrow' }, 'Urgency'), h('div', { class: 'v' }, tri.urgency), urgencyMeter(tri.urgency))));
+  } else {
+    box.append(h('div', { class: 'error view', style: 'margin-bottom:8px' }, t.triage_error));
+  }
+
+  // Help article the draft is based on (stretch goal), shown next to the reply.
+  side.querySelector('.article-card')?.remove();
+  if (tri) {
+    side.append(tri.article
+      ? h('div', { class: 'card tight view article-card' }, h('div', { class: 'row', style: 'justify-content:space-between' }, h('span', { class: 'eyebrow' }, 'Help article'), badge(tri.article.id, 'ok')),
+          h('h3', { style: 'margin:12px 0' }, tri.article.title), h('div', { class: 'muted' }, tri.article.body))
+      : h('div', { class: 'card tight view article-card' }, h('div', { class: 'eyebrow' }, 'Help article'), h('p', { class: 'muted', style: 'margin:12px 0 0' }, 'No matching article.')));
+  }
+
+  // Reply editor: the agent reviews/edits, then explicitly sends. Nothing is sent automatically.
+  const counter = h('span', { class: 'hint' });
+  const edited = badge('Edited', '');
+  const reset = h('button', { class: 'ghost', onclick: () => { text.value = original; update(); text.focus(); } }, 'Undo edits');
+  const copy = h('button', { class: 'ghost', onclick: async () => { await navigator.clipboard?.writeText(text.value); toast('Copied'); } }, 'Copy');
+  const err = h('div', { class: 'hidden', style: 'margin-top:16px' });
+  const send = h('button', { class: 'primary', onclick: async () => {
+      if (!text.value.trim()) return;
+      const ok = await confirmModal({ title: 'Send this reply?', okLabel: 'Send reply',
+        body: `To ${t.from_name ? t.from_name + ' ' : ''}<${t.from_email}>`, preview: text.value });
+      if (!ok) return;
+      err.className = 'hidden';
+      try { await busy(send, () => api(`/api/tickets/${t.id}/replies`, { method: 'POST', body: { body: text.value } })); toast('Reply sent'); renderTicket(t.id); }
+      catch (ex) { err.className = 'error'; err.textContent = ex.message; }
+    } }, 'Send reply');
+  function update() {
+    const words = text.value.trim() ? text.value.trim().split(/\s+/).length : 0;
+    counter.textContent = `${words} words`;
+    const changed = tri && text.value !== original;
+    edited.classList.toggle('hidden', !changed); reset.classList.toggle('hidden', !changed);
+    send.disabled = !text.value.trim();
+  }
+  text.addEventListener('input', update);
+  text.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') send.click(); });
+  box.append(
+    h('div', { class: 'editor-bar' }, h('label', {}, 'Reply'), edited, h('span', { class: 'grow' }), reset, tri ? copy : null),
+    text, err,
+    h('div', { class: 'row', style: 'margin-top:24px' }, send, h('span', { class: 'grow' }), counter));
+  update();
+}
+
+// ---------------- routing & boot ----------------
+function route() {
+  const m = location.hash.match(/^#ticket-(\d+)$/);
+  if (m && Number(m[1]) !== state.ticketId) renderTicket(Number(m[1]));
+  else if (!m && state.view === 'ticket') renderList();
+}
+window.addEventListener('popstate', () => me && route());
+
+async function boot() {
+  renderHeader();
+  [users] = await Promise.all([api('/api/users'), api('/api/updates').then(u => { state.lastSeenId = u.latest_id; })]);
+  startLive();
+  const m = location.hash.match(/^#ticket-(\d+)$/);
+  m ? renderTicket(Number(m[1])) : renderList();
+}
+
+api('/api/me').then(u => { me = u; boot(); }).catch(() => renderLogin());
+</script>
+</body>
+</html>
