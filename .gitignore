@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+.dev.vars
+data/
+*.db
+.venv/
+__pycache__/
+.pytest_cache/
+node_modules/
+.wrangler/
+.DS_Store
+python_modules/
+.venv-workers/
+pylock.toml

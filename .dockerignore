@@ -1,0 +1,11 @@
+.env
+.env.*
+.venv
+.venv-workers
+python_modules
+node_modules
+data
+.git
+tests
+__pycache__
+.pytest_cache
