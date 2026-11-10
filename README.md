@@ -4,7 +4,6 @@ A small tool for a four-person support team that shares one inbox. Tickets arriv
 webhook or a form, an AI agent proposes a category, urgency and draft reply, and a
 human reviews and sends it.
 
-**Live:** https://support-inbox-triage.ajsam1779.workers.dev
 
 **Stack:** Python · FastAPI · LangGraph · OpenRouter · SQLite (local) / Cloudflare D1 (prod) ·
 Cloudflare Python Workers (free plan) · plain HTML/JS frontend (no build step).
